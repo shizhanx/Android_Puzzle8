@@ -16,14 +16,26 @@ package com.google.engedu.puzzle8
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import androidx.core.graphics.scale
 import java.util.*
+import kotlin.math.min
 
 class PuzzleBoard {
-    private var tiles: MutableList<PuzzleTile?>? = null
+    private var tiles: MutableList<PuzzleTile?> = MutableList(NUM_TILES * NUM_TILES) { null }
 
-    internal constructor(bitmap: Bitmap?, parentWidth: Int) {}
+    internal constructor(bitmap: Bitmap, parentWidth: Int) {
+        val lengthOfSide = min(bitmap.height, bitmap.width)
+        val squareBitmap = Bitmap.createBitmap(bitmap, 0, 0, lengthOfSide, lengthOfSide)
+        val scaledBitmap = Bitmap.createScaledBitmap(squareBitmap, parentWidth, parentWidth, true)
+        val tileWidth = parentWidth / NUM_TILES
+        for (i in 0 until tiles.size - 1) {
+            val slice = Bitmap.createBitmap(scaledBitmap, (i % NUM_TILES) * tileWidth, (i / NUM_TILES) * tileWidth, tileWidth, tileWidth)
+            tiles[i] = PuzzleTile(slice, i)
+        }
+    }
+
     internal constructor(otherBoard: PuzzleBoard) {
-        tiles = otherBoard.tiles!!.map { it?.copy() }.toMutableList()
+        tiles = otherBoard.tiles.map { it?.copy() }.toMutableList()
     }
 
     fun reset() {
@@ -35,18 +47,15 @@ class PuzzleBoard {
     }
 
     fun draw(canvas: Canvas) {
-        if (tiles == null) {
-            return
-        }
         for (i in 0 until NUM_TILES * NUM_TILES) {
-            val tile = tiles!![i]
+            val tile = tiles[i]
             tile?.draw(canvas, i % NUM_TILES, i / NUM_TILES)
         }
     }
 
     fun click(x: Float, y: Float): Boolean {
         for (i in 0 until NUM_TILES * NUM_TILES) {
-            val tile = tiles!![i]
+            val tile = tiles[i]
             if (tile != null) {
                 if (tile.isClicked(x, y, i % NUM_TILES, i / NUM_TILES)) {
                     return tryMoving(i % NUM_TILES, i / NUM_TILES)
@@ -60,7 +69,7 @@ class PuzzleBoard {
         for (delta in NEIGHBOUR_COORDS) {
             val nullX = tileX + delta[0]
             val nullY = tileY + delta[1]
-            if (nullX in 0 until NUM_TILES && nullY in 0 until NUM_TILES && tiles!![XYtoIndex(nullX, nullY)] == null) {
+            if (nullX in 0 until NUM_TILES && nullY in 0 until NUM_TILES && tiles[XYtoIndex(nullX, nullY)] == null) {
                 swapTiles(XYtoIndex(nullX, nullY), XYtoIndex(tileX, tileY))
                 return true
             }
@@ -70,7 +79,7 @@ class PuzzleBoard {
 
     fun resolved(): Boolean {
         for (i in 0 until NUM_TILES * NUM_TILES - 1) {
-            val tile = tiles!![i]
+            val tile = tiles[i]
             if (tile == null || tile.number != i) return false
         }
         return true
@@ -81,9 +90,9 @@ class PuzzleBoard {
     }
 
     protected fun swapTiles(i: Int, j: Int) {
-        val temp = tiles!![i]
-        tiles!![i] = tiles!![j]
-        tiles!![j] = temp
+        val temp = tiles[i]
+        tiles[i] = tiles[j]
+        tiles[j] = temp
     }
 
     fun neighbours(): ArrayList<PuzzleBoard>? {
@@ -95,7 +104,7 @@ class PuzzleBoard {
     }
 
     override fun hashCode(): Int {
-        return tiles?.hashCode() ?: 0
+        return tiles.hashCode() ?: 0
     }
 
     companion object {

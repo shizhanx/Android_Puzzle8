@@ -27,7 +27,7 @@ class PuzzleBoardView(context: Context?) : View(context) {
     private val activity: Activity? = context as Activity?
     private var puzzleBoard: PuzzleBoard? = null
     private var animation: ArrayDeque<PuzzleBoard>?
-    fun initialize(imageBitmap: Bitmap?) {
+    fun initialize(imageBitmap: Bitmap) {
         val width = width
         puzzleBoard = PuzzleBoard(imageBitmap, width)
     }

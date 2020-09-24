@@ -66,13 +66,10 @@ class PuzzleActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             if (data != null) {
-                imageBitmap = data.extras?.get("data") as Bitmap?
+                imageBitmap = data.extras!!.get("data") as Bitmap
             }
         }
-        findViewById<ImageView>(R.id.imageView).apply {
-            setImageBitmap(imageBitmap)
-            invalidate()
-        }
+        boardView!!.initialize(imageBitmap!!)
         super.onActivityResult(requestCode, resultCode, data)
     }
 
