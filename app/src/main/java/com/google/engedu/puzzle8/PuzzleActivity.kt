@@ -17,14 +17,16 @@ package com.google.engedu.puzzle8
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 
 class PuzzleActivity : AppCompatActivity() {
-    private val imageBitmap: Bitmap? = null
+    private var imageBitmap: Bitmap? = null
     private var boardView: PuzzleBoardView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +56,26 @@ class PuzzleActivity : AppCompatActivity() {
         } else super.onOptionsItemSelected(item)
     }
 
-    fun dispatchTakePictureIntent(view: View?) {}
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {}
+    fun dispatchTakePictureIntent(view: View?) {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePictureIntent.resolveActivity(packageManager)?.also {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            if (data != null) {
+                imageBitmap = data.extras?.get("data") as Bitmap?
+            }
+        }
+        findViewById<ImageView>(R.id.imageView).apply {
+            setImageBitmap(imageBitmap)
+            invalidate()
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     fun shuffleImage(view: View?) {
         boardView!!.shuffle()
     }
