@@ -35,7 +35,7 @@ class PuzzleBoard {
     }
 
     internal constructor(otherBoard: PuzzleBoard) {
-        tiles = otherBoard.tiles.map { it?.copy() }.toMutableList()
+        tiles = otherBoard.tiles.toMutableList()
     }
 
     fun reset() {
@@ -86,17 +86,31 @@ class PuzzleBoard {
     }
 
     private fun XYtoIndex(x: Int, y: Int): Int {
-        return x + y * NUM_TILES
+        return if (x in 0 until NUM_TILES && y in 0 until NUM_TILES) {
+            x + y * NUM_TILES
+        } else -1
     }
 
-    protected fun swapTiles(i: Int, j: Int) {
+    private fun swapTiles(i: Int, j: Int) {
         val temp = tiles[i]
         tiles[i] = tiles[j]
         tiles[j] = temp
     }
 
-    fun neighbours(): ArrayList<PuzzleBoard>? {
-        return null
+    fun neighbours(): List<PuzzleBoard> {
+        val nullIndex = tiles.indexOf(null)
+        val x = nullIndex % NUM_TILES
+        val y = nullIndex / NUM_TILES
+        val ans = mutableListOf<PuzzleBoard>()
+        for (coordinate in NEIGHBOUR_COORDS) {
+            val neighbourIndex = XYtoIndex(x + coordinate[0], y + coordinate[1])
+            if (neighbourIndex >= 0) {
+                val neighbour = PuzzleBoard(this)
+                neighbour.swapTiles(nullIndex, neighbourIndex)
+                ans.add(neighbour)
+            }
+        }
+        return ans.toList()
     }
 
     fun priority(): Int {

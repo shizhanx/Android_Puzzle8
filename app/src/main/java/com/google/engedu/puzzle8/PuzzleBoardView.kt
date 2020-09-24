@@ -54,7 +54,9 @@ class PuzzleBoardView(context: Context?) : View(context) {
 
     fun shuffle() {
         if (animation == null && puzzleBoard != null) {
-            // Do something. Then:
+            for (step in 1..NUM_SHUFFLE_STEPS) {
+
+            }
             puzzleBoard!!.reset()
             invalidate()
         }
