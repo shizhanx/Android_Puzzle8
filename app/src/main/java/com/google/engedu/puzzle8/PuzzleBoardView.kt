@@ -24,10 +24,9 @@ import android.widget.Toast
 import java.util.*
 
 class PuzzleBoardView(context: Context?) : View(context) {
-    private val activity: Activity?
+    private val activity: Activity? = context as Activity?
     private var puzzleBoard: PuzzleBoard? = null
-    private var animation: ArrayList<PuzzleBoard>?
-    private val random = Random()
+    private var animation: ArrayDeque<PuzzleBoard>?
     fun initialize(imageBitmap: Bitmap?) {
         val width = width
         puzzleBoard = PuzzleBoard(imageBitmap, width)
@@ -36,8 +35,8 @@ class PuzzleBoardView(context: Context?) : View(context) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (puzzleBoard != null) {
-            if (animation != null && animation!!.size > 0) {
-                puzzleBoard = animation!!.removeAt(0)
+            if (animation != null && animation!!.isNotEmpty()) {
+                puzzleBoard = animation!!.poll()
                 puzzleBoard!!.draw(canvas)
                 if (animation!!.size == 0) {
                     animation = null
@@ -84,7 +83,6 @@ class PuzzleBoardView(context: Context?) : View(context) {
     }
 
     init {
-        activity = context as Activity?
         animation = null
     }
 }

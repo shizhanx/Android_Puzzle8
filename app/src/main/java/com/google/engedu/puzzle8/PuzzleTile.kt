@@ -29,4 +29,8 @@ class PuzzleTile(private val bitmap: Bitmap, val number: Int) {
         val tileY1 = (tileY + 1) * bitmap.width
         return clickX >= tileX0 && clickX < tileX1 && clickY >= tileY0 && clickY < tileY1
     }
+
+    fun copy(): PuzzleTile {
+        return PuzzleTile(this.bitmap, this.number)
+    }
 }

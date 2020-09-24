@@ -19,22 +19,22 @@ import android.graphics.Canvas
 import java.util.*
 
 class PuzzleBoard {
-    private var tiles: ArrayList<PuzzleTile?>? = null
+    private var tiles: MutableList<PuzzleTile?>? = null
 
     internal constructor(bitmap: Bitmap?, parentWidth: Int) {}
     internal constructor(otherBoard: PuzzleBoard) {
-        tiles = otherBoard.tiles!!.clone() as ArrayList<PuzzleTile?>
+        tiles = otherBoard.tiles!!.map { it?.copy() }.toMutableList()
     }
 
     fun reset() {
         // Nothing for now but you may have things to reset once you implement the solver.
     }
 
-    override fun equals(o: Any?): Boolean {
-        return if (o == null) false else tiles == (o as PuzzleBoard).tiles
+    override fun equals(other: Any?): Boolean {
+        return if (other == null) false else tiles == (other as PuzzleBoard).tiles
     }
 
-    fun draw(canvas: Canvas?) {
+    fun draw(canvas: Canvas) {
         if (tiles == null) {
             return
         }
@@ -60,7 +60,7 @@ class PuzzleBoard {
         for (delta in NEIGHBOUR_COORDS) {
             val nullX = tileX + delta[0]
             val nullY = tileY + delta[1]
-            if (nullX >= 0 && nullX < NUM_TILES && nullY >= 0 && nullY < NUM_TILES && tiles!![XYtoIndex(nullX, nullY)] == null) {
+            if (nullX in 0 until NUM_TILES && nullY in 0 until NUM_TILES && tiles!![XYtoIndex(nullX, nullY)] == null) {
                 swapTiles(XYtoIndex(nullX, nullY), XYtoIndex(tileX, tileY))
                 return true
             }
@@ -92,6 +92,10 @@ class PuzzleBoard {
 
     fun priority(): Int {
         return 0
+    }
+
+    override fun hashCode(): Int {
+        return tiles?.hashCode() ?: 0
     }
 
     companion object {
