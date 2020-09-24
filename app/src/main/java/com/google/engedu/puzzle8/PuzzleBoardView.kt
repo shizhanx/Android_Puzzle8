@@ -25,7 +25,7 @@ import java.util.*
 
 class PuzzleBoardView(context: Context?) : View(context) {
     private val activity: Activity? = context as Activity?
-    private lateinit var puzzleBoard: PuzzleBoard
+    private var puzzleBoard: PuzzleBoard? = null
     private var animation: ArrayDeque<PuzzleBoard>?
     fun initialize(imageBitmap: Bitmap) {
         val width = width
@@ -34,38 +34,40 @@ class PuzzleBoardView(context: Context?) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (animation != null && animation!!.isNotEmpty()) {
-            puzzleBoard = animation!!.poll()!!
-            puzzleBoard.draw(canvas)
-            if (animation!!.size == 0) {
-                animation = null
-                puzzleBoard.reset()
-                val toast = Toast.makeText(activity, "Solved! ", Toast.LENGTH_LONG)
-                toast.show()
+        if (puzzleBoard != null) {
+            if (animation != null && animation!!.isNotEmpty()) {
+                puzzleBoard = animation!!.poll()
+                puzzleBoard!!.draw(canvas)
+                if (animation!!.size == 0) {
+                    animation = null
+                    puzzleBoard!!.reset()
+                    val toast = Toast.makeText(activity, "Solved! ", Toast.LENGTH_LONG)
+                    toast.show()
+                } else {
+                    this.postInvalidateDelayed(500)
+                }
             } else {
-                this.postInvalidateDelayed(500)
+                puzzleBoard!!.draw(canvas)
             }
-        } else {
-            puzzleBoard.draw(canvas)
         }
     }
 
     fun shuffle() {
-        if (animation == null) {
+        if (animation == null && puzzleBoard != null) {
             for (step in 1..NUM_SHUFFLE_STEPS) {
-                puzzleBoard = puzzleBoard.neighbours().random()
+
             }
-            puzzleBoard.reset()
+            puzzleBoard!!.reset()
             invalidate()
         }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (animation == null) {
+        if (animation == null && puzzleBoard != null) {
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> if (puzzleBoard.click(event.x, event.y)) {
+                MotionEvent.ACTION_DOWN -> if (puzzleBoard!!.click(event.x, event.y)) {
                     invalidate()
-                    if (puzzleBoard.resolved()) {
+                    if (puzzleBoard!!.resolved()) {
                         val toast = Toast.makeText(activity, "Congratulations!", Toast.LENGTH_LONG)
                         toast.show()
                     }
