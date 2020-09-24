@@ -55,7 +55,7 @@ class PuzzleBoardView(context: Context?) : View(context) {
     fun shuffle() {
         if (animation == null && puzzleBoard != null) {
             for (step in 1..NUM_SHUFFLE_STEPS) {
-
+                puzzleBoard = puzzleBoard!!.neighbours().random()
             }
             puzzleBoard!!.reset()
             invalidate()
