@@ -22,6 +22,8 @@ import kotlin.math.min
 
 class PuzzleBoard {
     private var tiles: MutableList<PuzzleTile?> = MutableList(NUM_TILES * NUM_TILES) { null }
+    var step = 0
+    var parentBoard: PuzzleBoard? = null
 
     internal constructor(bitmap: Bitmap, parentWidth: Int) {
         val lengthOfSide = min(bitmap.height, bitmap.width)
@@ -36,6 +38,8 @@ class PuzzleBoard {
 
     internal constructor(otherBoard: PuzzleBoard) {
         tiles = otherBoard.tiles.toMutableList()
+        step = otherBoard.step
+        parentBoard = otherBoard
     }
 
     fun reset() {
@@ -107,13 +111,16 @@ class PuzzleBoard {
             if (neighbourIndex >= 0) {
                 val neighbour = PuzzleBoard(this)
                 neighbour.swapTiles(nullIndex, neighbourIndex)
-                ans.add(neighbour)
+                neighbour.step++
+                if (parentBoard?.tiles != neighbour.tiles)
+                    ans.add(neighbour)
             }
         }
         return ans.toList()
     }
 
     fun priority(): Int {
+
         return 0
     }
 
