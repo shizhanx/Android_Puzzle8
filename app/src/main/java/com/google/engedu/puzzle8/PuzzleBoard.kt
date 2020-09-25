@@ -44,7 +44,8 @@ class PuzzleBoard {
     }
 
     fun reset() {
-        // Nothing for now but you may have things to reset once you implement the solver.
+        step = 0
+        parentBoard = null
     }
 
     override fun equals(other: Any?): Boolean {

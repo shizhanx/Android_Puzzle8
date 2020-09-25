@@ -36,7 +36,7 @@ class PuzzleBoardView(context: Context?) : View(context) {
         super.onDraw(canvas)
         if (puzzleBoard != null) {
             if (animation != null && animation!!.isNotEmpty()) {
-                puzzleBoard = animation!!.poll()
+                puzzleBoard = animation!!.pop()
                 puzzleBoard!!.draw(canvas)
                 if (animation!!.size == 0) {
                     animation = null
@@ -78,7 +78,30 @@ class PuzzleBoardView(context: Context?) : View(context) {
         return super.onTouchEvent(event)
     }
 
-    fun solve() {}
+    fun solve() {
+        val pq = PriorityQueue(
+                compareBy<PuzzleBoard> {
+                    it.priority()
+                })
+        pq.offer(puzzleBoard!!)
+        animation = ArrayDeque<PuzzleBoard>()
+        while (pq.isNotEmpty()) {
+            val cur = pq.poll()!!
+            if (cur.resolved()) {
+                animation!!.push(cur)
+                var backtrack = cur
+                while (backtrack.parentBoard != null) {
+                    animation!!.push(backtrack.parentBoard)
+                    backtrack = backtrack.parentBoard!!
+                }
+                break
+            }
+            for (board in cur.neighbours()) {
+                pq.offer(board)
+            }
+        }
+        invalidate()
+    }
 
     companion object {
         const val NUM_SHUFFLE_STEPS = 40
