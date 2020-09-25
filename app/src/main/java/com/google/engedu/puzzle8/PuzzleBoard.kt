@@ -18,6 +18,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.core.graphics.scale
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.min
 
 class PuzzleBoard {
@@ -120,8 +121,16 @@ class PuzzleBoard {
     }
 
     fun priority(): Int {
-
-        return 0
+        return step + with(tiles) {
+            var distance = 0
+            forEachIndexed { index, puzzleTile ->
+                if (puzzleTile != null) {
+                    distance += abs((puzzleTile.number % NUM_TILES) - (index % NUM_TILES)) +
+                            abs((puzzleTile.number / NUM_TILES) - (index / NUM_TILES))
+                }
+            }
+            distance
+        }
     }
 
     override fun hashCode(): Int {
